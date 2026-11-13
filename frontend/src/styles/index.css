@@ -34,3 +34,12 @@ h3,
 h4 {
   font-family: var(--font-heading);
 }
+.heritage-grayscale {
+  filter: grayscale(100%);
+  transition:
+    filter 0.45s ease,
+    transform 0.35s ease;
+}
+.heritage-grayscale:hover {
+  filter: grayscale(0%);
+}

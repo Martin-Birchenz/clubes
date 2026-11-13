@@ -62,6 +62,34 @@ class TenantRepository {
     );
     return result.affectedRows > 0;
   }
+
+  async getPublicBootstrapBySlug(slug) {
+    const [rows] = await pool.query(
+      `SELECT 
+         t.id, t.name, t.short_name, t.slug, t.city, t.province,
+         tc.*
+       FROM tenants t
+       JOIN tenant_config tc ON tc.tenant_id = t.id
+       WHERE t.slug = ? AND t.is_active = 1 AND t.subscription_status != 'suspended'
+       LIMIT 1`,
+      [slug],
+    );
+    if (!rows[0]) return null;
+
+    const tenantId = rows[0].id;
+
+    const [disciplines] = await pool.query(
+      "SELECT id, name, slug, description, image_url, schedule_info, has_bookings, has_classes FROM disciplines WHERE tenant_id = ? AND is_active = 1 ORDER BY name ASC",
+      [tenantId],
+    );
+
+    const [faqs] = await pool.query(
+      "SELECT id, question, answer FROM tenant_faqs WHERE tenant_id = ? ORDER BY sort_order ASC, id ASC",
+      [tenantId],
+    );
+
+    return { ...rows[0], disciplines, faqs };
+  }
 }
 
 module.exports = new TenantRepository();

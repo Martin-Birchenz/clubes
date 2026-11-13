@@ -122,6 +122,18 @@ class TenantService {
         bankHolderName: config.bank_holder_name,
         mpPublicKey: config.mp_public_key,
       },
+      institutional: {
+        themeVariant: config.theme_variant,
+        heroSubtitle: config.hero_subtitle,
+        foundedYear: config.founded_year,
+        historyTitle: config.history_title,
+        historyText: config.history_text,
+        historyImageUrl: config.history_image_url,
+        address: config.address,
+        googleMapsEmbedUrl: config.google_maps_embed_url,
+        disciplines: config.disciplines || [],
+        faqs: config.faqs || [],
+      },
     };
   }
 

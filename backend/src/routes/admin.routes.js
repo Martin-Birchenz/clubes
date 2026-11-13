@@ -13,6 +13,7 @@ const {
   createReservationSchema,
 } = require("../schemas/booking.schema.js");
 const posController = require("../controllers/pos.controller.js");
+const pool = require("../config/db.js");
 
 const router = Router();
 const upload = multer({
@@ -106,5 +107,53 @@ router.post("/pos/:posId/sales", requireModule("canteen"), (req, res, next) =>
 router.post("/pos/expenses", requireModule("canteen"), (req, res, next) =>
   posController.createExpense(req, res, next),
 );
+
+router.put("/site-content", requireModule("all"), async (req, res, next) => {
+  try {
+    const {
+      heroBannerUrl,
+      heroSubtitle,
+      foundedYear,
+      historyTitle,
+      historyText,
+      historyImageUrl,
+      address,
+      bankAlias,
+      whatsappSecretary,
+    } = req.body;
+
+    await pool.query(
+      `UPDATE tenant_config SET
+         hero_banner_url = COALESCE(?, hero_banner_url),
+         hero_subtitle = ?,
+         founded_year = ?,
+         history_title = ?,
+         history_text = ?,
+         history_image_url = COALESCE(?, history_image_url),
+         address = ?,
+         bank_alias = ?,
+         whatsapp_secretary = ?
+       WHERE tenant_id = ?`,
+      [
+        heroBannerUrl || null,
+        heroSubtitle || null,
+        foundedYear || null,
+        historyTitle || null,
+        historyText || null,
+        historyImageUrl || null,
+        address || null,
+        bankAlias || null,
+        whatsappSecretary || null,
+        req.tenantId,
+      ],
+    );
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Sitio institucional actualizado" });
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

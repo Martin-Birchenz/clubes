@@ -76,6 +76,7 @@ export function TenantProvider({ children }) {
         contact: tenantData?.contact || {},
         loading,
         error,
+        institutional: tenantData?.institutional || {},
       }}
     >
       {children}
