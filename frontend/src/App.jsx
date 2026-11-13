@@ -1,12 +1,12 @@
-import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { useTenant } from "./context/TenantContext";
 
 // Layouts
 import PublicClubLayout from "./layouts/PublicClubLayout";
 import AdminLayout from "./layouts/AdminLayout";
 
-// Páginas Públicas (Modo Camaleón)
+// Páginas Públicas (Modo Camaleón Heritage)
+import PublicClubHome from "./pages/public/PublicClubHome";
 import MemberPortal from "./pages/public/MemberPortal";
 
 // Páginas Admin & SuperAdmin
@@ -16,53 +16,7 @@ import AdminMembers from "./pages/admin/AdminMembers";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminCanteen from "./pages/admin/AdminCanteen";
 import AdminAccessControl from "./pages/admin/AdminAccessControl";
-
-function PublicClubHome() {
-  const { tenant, theme, flags } = useTenant();
-
-  return (
-    <div className="space-y-8">
-      <section className="bg-primary text-white rounded-3xl p-8 md:p-12 shadow-lg">
-        <div className="max-w-2xl space-y-4">
-          {theme?.logoUrl && (
-            <img
-              src={theme.logoUrl}
-              alt={tenant.name}
-              className="h-16 w-16 rounded-2xl bg-white p-1.5 object-contain"
-            />
-          )}
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            {tenant.name}
-          </h1>
-          <p className="text-white/80 text-base">
-            Portal oficial de socios, autogestión de cuotas y reserva de
-            instalaciones
-            {tenant.city ? ` • ${tenant.city}, ${tenant.province}` : ""}.
-          </p>
-
-          <div className="flex flex-wrap gap-3 pt-2">
-            {flags.hasMemberships && (
-              <Link
-                to={`/c/${tenant.slug}/mi-carnet`}
-                className="bg-secondary text-white px-5 py-3 rounded-xl font-bold text-sm hover:opacity-90 transition"
-              >
-                Consultar Cuota y Carnet QR
-              </Link>
-            )}
-            {flags.hasBookings && (
-              <Link
-                to={`/c/${tenant.slug}/turnos`}
-                className="bg-white text-primary px-5 py-3 rounded-xl font-bold text-sm hover:bg-gray-100 transition"
-              >
-                Ver Canchas y Turnos
-              </Link>
-            )}
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
+import AdminSiteEditor from "./pages/admin/AdminSiteEditor";
 
 function RequireSuperAdmin({ children }) {
   const { user, isAuthenticated } = useAuth();
@@ -82,7 +36,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Portal Público Multi-Tenant (Modo Camaleón) */}
+          {/* Portal Público Multi-Tenant (Modo Camaleón Heritage) */}
           <Route path="/c/:slug" element={<PublicClubLayout />}>
             <Route index element={<PublicClubHome />} />
             <Route path="mi-carnet" element={<MemberPortal />} />
@@ -127,6 +81,7 @@ export default function App() {
             <Route path="turnos" element={<AdminBookings />} />
             <Route path="cantina" element={<AdminCanteen />} />
             <Route path="porteria" element={<AdminAccessControl />} />
+            <Route path="sitio" element={<AdminSiteEditor />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />
