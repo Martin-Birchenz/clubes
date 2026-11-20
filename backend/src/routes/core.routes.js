@@ -9,6 +9,7 @@ const {
 } = require("../schemas/tenant.schema.js");
 const { resolvePublicTenant } = require("../middlewares/tenant.middleware.js");
 const publicMemberController = require("../controllers/publicMember.controller.js");
+const publicBookingController = require("../controllers/publicBooking.controller.js");
 
 const router = Router();
 
@@ -46,6 +47,12 @@ router.get(
   "/public/c/:slug/members/:dni",
   resolvePublicTenant,
   (req, res, next) => publicMemberController.lookupByDni(req, res, next),
+);
+
+router.get(
+  "/public/c/:slug/bookings/availability",
+  resolvePublicTenant,
+  (req, res, next) => publicBookingController.getAvailability(req, res, next),
 );
 
 module.exports = router;

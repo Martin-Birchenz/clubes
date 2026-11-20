@@ -8,10 +8,12 @@ import AdminLayout from "./layouts/AdminLayout";
 // Páginas Públicas (Modo Camaleón Heritage)
 import PublicClubHome from "./pages/public/PublicClubHome";
 import MemberPortal from "./pages/public/MemberPortal";
+import PublicBookings from "./pages/public/PublicBookings";
 
 // Páginas Admin & SuperAdmin
 import Login from "./pages/admin/Login";
 import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminMembers from "./pages/admin/AdminMembers";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminCanteen from "./pages/admin/AdminCanteen";
@@ -40,18 +42,7 @@ export default function App() {
           <Route path="/c/:slug" element={<PublicClubLayout />}>
             <Route index element={<PublicClubHome />} />
             <Route path="mi-carnet" element={<MemberPortal />} />
-            <Route
-              path="turnos"
-              element={
-                <div className="bg-surface p-6 rounded-2xl border border-gray-200">
-                  <h2 className="text-xl font-bold mb-2">Turnero Público</h2>
-                  <p className="text-sm text-gray-600">
-                    Consultá disponibilidad o comunicate con la secretaría del
-                    club para reservar tu horario.
-                  </p>
-                </div>
-              }
-            />
+            <Route path="turnos" element={<PublicBookings />} />
           </Route>
 
           {/* Login Unificado */}
@@ -76,7 +67,7 @@ export default function App() {
               </RequireStaff>
             }
           >
-            <Route index element={<Navigate to="socios" replace />} />
+            <Route index element={<AdminDashboard />} />
             <Route path="socios" element={<AdminMembers />} />
             <Route path="turnos" element={<AdminBookings />} />
             <Route path="cantina" element={<AdminCanteen />} />
