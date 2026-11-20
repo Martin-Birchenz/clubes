@@ -15,13 +15,26 @@ import {
 import { useAuth } from "../context/AuthContext";
 
 export default function AdminLayout() {
-  const { user, logout, activeTenantId, activeTenantName, exitSupportMode } =
-    useAuth();
+  const { user, logout, activeTenantName, exitSupportMode } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const isSuperAdmin = user?.roleCode === "superadmin";
-  const permissions = user?.permissions || [];
+  const isSuperAdmin =
+    user?.roleCode === "superadmin" || user?.role === "superadmin";
+
+  const rawPermissions = user?.permissions;
+  const permissions = Array.isArray(rawPermissions)
+    ? rawPermissions
+    : typeof rawPermissions === "string"
+      ? (() => {
+          try {
+            const parsed = JSON.parse(rawPermissions);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        })()
+      : [];
 
   const canAccess = (requiredModule) => {
     if (isSuperAdmin || permissions.includes("all")) return true;
@@ -74,20 +87,28 @@ export default function AdminLayout() {
   };
 
   const handleExitSupport = () => {
-    exitSupportMode();
+    if (typeof exitSupportMode === "function") {
+      exitSupportMode();
+    }
     navigate("/superadmin");
   };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Banner de Modo Soporte para SuperAdmin */}
-      {isSuperAdmin && activeTenantId && (
+      {/* Banner permanente de retorno para SuperAdmin */}
+      {isSuperAdmin && (
         <div className="bg-amber-500 text-slate-950 px-4 py-2 text-xs font-bold flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldAlert className="h-4 w-4" />
-            <span>MODO SOPORTE ACTIVO — Administrando: {activeTenantName}</span>
+            <span>
+              MODO SUPERADMIN —{" "}
+              {activeTenantName
+                ? `Administrando: ${activeTenantName}`
+                : "Vista de Administración"}
+            </span>
           </div>
           <button
+            type="button"
             onClick={handleExitSupport}
             className="bg-slate-900 text-white px-3 py-1 rounded text-xs hover:bg-slate-800 cursor-pointer"
           >
@@ -108,7 +129,7 @@ export default function AdminLayout() {
                 {activeTenantName || user?.tenantName || "Gestión Deportiva"}
               </h1>
               <span className="inline-block mt-1 text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded uppercase">
-                {user?.roleName || user?.roleCode}
+                {user?.roleName || user?.roleCode || user?.role}
               </span>
             </div>
 
@@ -162,6 +183,7 @@ export default function AdminLayout() {
                 {user?.fullName}
               </p>
               <button
+                type="button"
                 onClick={handleLogout}
                 className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-red-300 hover:bg-slate-800 cursor-pointer"
               >
